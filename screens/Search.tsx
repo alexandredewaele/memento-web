@@ -1,22 +1,12 @@
 import React, { useState } from 'react'
 import { EntryCategory, JournalEntry } from '@/types'
 import * as api from '@/api/entries'
+import { getCategoryColorClasses } from '@/utils/theme'
 
 interface SearchProps {
   entries: JournalEntry[]
   onEntryDeleted: (id: string) => void
   onEntryUpdated: (entry: JournalEntry) => void
-}
-
-const categoryColors: Record<EntryCategory, string> = {
-  [EntryCategory.FACT]:
-    'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
-  [EntryCategory.WORD]:
-    'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-  [EntryCategory.INSIGHT]:
-    'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
-  [EntryCategory.QUOTE]:
-    'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
 }
 
 const Search: React.FC<SearchProps> = ({
@@ -116,19 +106,29 @@ const Search: React.FC<SearchProps> = ({
 
         {/* Category filters */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                selectedCategory === cat
-                  ? 'bg-primary text-white shadow-md shadow-primary/20'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary/50'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {categories.map((cat) => {
+            const isAll = cat === 'All'
+            const isActive = selectedCategory === cat
+            const colors = !isAll
+              ? getCategoryColorClasses(cat as EntryCategory)
+              : null
+
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  isActive
+                    ? isAll
+                      ? 'bg-primary text-white shadow-md shadow-primary/20 border border-primary'
+                      : colors!.buttonActive
+                    : `bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 ${isAll ? 'hover:border-primary/50' : colors!.buttonHover}`
+                }`}
+              >
+                {cat}
+              </button>
+            )
+          })}
           {selectedCategory !== 'All' && (
             <button
               onClick={() => setSelectedCategory('All')}
@@ -163,7 +163,7 @@ const Search: React.FC<SearchProps> = ({
               >
                 <div className="flex justify-between items-start mb-3">
                   <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide ${categoryColors[item.category]}`}
+                    className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide ${getCategoryColorClasses(item.category).badge}`}
                   >
                     {item.category}
                   </span>

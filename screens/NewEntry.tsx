@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { EntryCategory, JournalEntry } from '@/types'
 import * as api from '@/api/entries'
 import { Button } from '@/components/Button'
+import { getCategoryColorClasses } from '@/utils/theme'
+
 interface NewEntryProps {
   onSaved: (entry: JournalEntry) => void
   onCancel: () => void
@@ -87,14 +89,15 @@ const NewEntry: React.FC<NewEntryProps> = ({ onSaved, onCancel }) => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {categories.map((cat) => {
               const isActive = category === cat.type
+              const colors = getCategoryColorClasses(cat.type)
               return (
                 <button
                   key={cat.type}
                   onClick={() => setCategory(cat.type)}
                   className={`flex flex-col items-center gap-2 p-4 rounded-2xl text-sm font-medium transition-all border ${
                     isActive
-                      ? 'bg-primary text-white shadow-lg shadow-primary/20 border-primary'
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary/50'
+                      ? colors.buttonActive
+                      : `bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 ${colors.buttonHover}`
                   }`}
                 >
                   <span className="material-icons-round text-2xl">

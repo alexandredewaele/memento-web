@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { JournalEntry } from '@/types'
+import { getCategoryColorClasses } from '@/utils/theme'
 
 interface HistoryProps {
   entries: JournalEntry[]
@@ -20,14 +21,16 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
   const firstDayOfWeek = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7
 
-  const entryDays = new Set(
-    entries
-      .filter((e) => {
-        const d = new Date(e.created_at)
-        return d.getFullYear() === viewYear && d.getMonth() === viewMonth
-      })
-      .map((e) => new Date(e.created_at).getDate()),
-  )
+  const entriesByDay = new Map<number, JournalEntry[]>()
+  entries.forEach((e) => {
+    const d = new Date(e.created_at)
+    if (d.getFullYear() === viewYear && d.getMonth() === viewMonth) {
+      const day = d.getDate()
+      const existing = entriesByDay.get(day) || []
+      existing.push(e)
+      entriesByDay.set(day, existing)
+    }
+  })
 
   const prevMonth = () => {
     if (viewMonth === 0) {
@@ -140,7 +143,8 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
             {Array.from({ length: daysInMonth }, (_, i) => {
               const day = i + 1
               const isSelected = day === selectedDay
-              const hasEntry = entryDays.has(day)
+              const dayEntries = entriesByDay.get(day) || []
+              const hasEntry = dayEntries.length > 0
               const isToday =
                 day === now.getDate() &&
                 viewMonth === now.getMonth() &&
@@ -150,7 +154,7 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
                 <button
                   key={day}
                   onClick={() => setSelectedDay(day)}
-                  className={`h-10 w-full flex flex-col items-center justify-center rounded-xl relative transition-all ${
+                  className={`h-11 w-full flex flex-col items-center justify-start pt-1.5 rounded-xl relative transition-all ${
                     isSelected
                       ? 'bg-primary text-white shadow-lg shadow-primary/30'
                       : isToday
@@ -158,12 +162,31 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
                         : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  <span className="text-sm font-medium">{day}</span>
-                  {hasEntry && !isSelected && (
-                    <span className="w-1 h-1 bg-primary rounded-full mt-0.5" />
-                  )}
-                  {hasEntry && isSelected && (
-                    <span className="w-1 h-1 bg-white rounded-full mt-0.5 opacity-80" />
+                  <span className="text-sm font-medium leading-none mb-1">
+                    {day}
+                  </span>
+                  {hasEntry && (
+                    <div className="flex items-center justify-center gap-[2px] h-1.5 mt-auto mb-1.5">
+                      {dayEntries.slice(0, 3).map((e, idx) => (
+                        <span
+                          key={idx}
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            isSelected
+                              ? 'bg-white opacity-90'
+                              : getCategoryColorClasses(e.category).dot
+                          }`}
+                        />
+                      ))}
+                      {dayEntries.length > 3 && (
+                        <span
+                          className={`text-[8px] font-bold leading-none ml-[1px] ${
+                            isSelected ? 'text-white/90' : 'text-slate-400'
+                          }`}
+                        >
+                          +
+                        </span>
+                      )}
+                    </div>
                   )}
                 </button>
               )
@@ -190,7 +213,9 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
             {selectedEntry ? (
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 max-w-2xl">
                 <div className="flex items-start justify-between mb-4">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${getCategoryColorClasses(selectedEntry.category).badge}`}
+                  >
                     {selectedEntry.category}
                   </span>
                   <span

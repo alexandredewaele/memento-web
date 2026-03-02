@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { JournalEntry } from '@/types'
 import * as api from '@/api/entries'
 import { Button } from '@/components/Button'
+import { getCategoryColorClasses } from '@/utils/theme'
+
 interface HomeProps {
   entries: JournalEntry[]
   loading: boolean
@@ -94,39 +96,45 @@ const Home: React.FC<HomeProps> = ({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {entries.map((entry, idx) => (
-            <button
-              key={entry.id}
-              onClick={() => setSelectedEntry(entry)}
-              className={`w-full text-left px-6 py-4 border-b border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
-                displayEntry?.id === entry.id
-                  ? 'bg-primary/5 border-l-2 border-l-primary'
-                  : ''
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-slate-400">
-                  {formatDate(entry.created_at)}
-                </span>
-                {entry.is_favorite && (
-                  <span className="material-icons-round text-red-400 text-sm">
-                    favorite
+          {entries.map((entry, idx) => {
+            const colors = getCategoryColorClasses(entry.category)
+            return (
+              <button
+                key={entry.id}
+                onClick={() => setSelectedEntry(entry)}
+                className={`w-full text-left px-6 py-4 border-b border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-2 ${
+                  displayEntry?.id === entry.id
+                    ? `${colors.bgSelected} ${colors.border}`
+                    : 'border-transparent'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
+                    <span className="text-xs font-medium text-slate-400">
+                      {formatDate(entry.created_at)}
+                    </span>
+                  </div>
+                  {entry.is_favorite && (
+                    <span className="material-icons-round text-red-400 text-sm">
+                      favorite
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                  {entry.title}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  {entry.content}
+                </p>
+                {idx === 0 && (
+                  <span className="mt-1.5 inline-block text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                    Latest
                   </span>
                 )}
-              </div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                {entry.title}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                {entry.content}
-              </p>
-              {idx === 0 && (
-                <span className="mt-1.5 inline-block text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                  Latest
-                </span>
-              )}
-            </button>
-          ))}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -139,10 +147,12 @@ const Home: React.FC<HomeProps> = ({
 
           <div className="flex items-start justify-between mb-8 relative z-10">
             <div>
-              <span className="text-xs font-bold text-primary uppercase tracking-widest">
+              <span
+                className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${getCategoryColorClasses(displayEntry.category).badge}`}
+              >
                 {displayEntry.category}
               </span>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                 {formatDate(displayEntry.created_at)}
               </p>
             </div>
