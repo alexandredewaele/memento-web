@@ -7,6 +7,7 @@ dist/
 # Environment (keep .env.example, never commit .env.local)
 .env.local
 .env.*.local
+.env
 
 # Vite
 *.local
