@@ -78,9 +78,9 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
   })()
 
   return (
-    <div className="flex h-full overflow-hidden bg-background-light dark:bg-background-dark">
+    <div className="flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden bg-background-light dark:bg-background-dark">
       {/* Left: Calendar panel */}
-      <div className="w-96 shrink-0 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full overflow-y-auto">
+      <div className="w-full md:w-96 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col md:h-full md:overflow-y-auto">
         {/* Stats */}
         <div className="px-6 pt-8 pb-4 grid grid-cols-2 gap-3">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700">
@@ -196,7 +196,7 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
       </div>
 
       {/* Right: Day detail */}
-      <div className="flex-1 overflow-y-auto p-10">
+      <div className="flex-1 md:overflow-y-auto p-6 md:p-10">
         {selectedDay ? (
           <>
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-2">
