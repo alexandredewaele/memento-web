@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { JournalEntry } from '@/types'
 import { getCategoryColorClasses } from '@/utils/theme'
-
+import HistoryEntryCard from '@/components/HistoryEntryCard'
 interface HistoryProps {
   entries: JournalEntry[]
 }
@@ -204,36 +204,7 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
             {selectedEntries.length > 0 ? (
               <div className="flex flex-col gap-6">
                 {selectedEntries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 max-w-2xl"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <span
-                        className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${getCategoryColorClasses(entry.category).badge}`}
-                      >
-                        {entry.category}
-                      </span>
-                      <span
-                        className={`material-icons-round text-xl ${entry.is_favorite ? 'text-red-400' : 'text-slate-300 dark:text-slate-600'}`}
-                      >
-                        {entry.is_favorite ? 'favorite' : 'favorite_border'}
-                      </span>
-                    </div>
-                    <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                      {entry.title}
-                    </h3>
-                    <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {entry.content}
-                    </p>
-                    {entry.example && (
-                      <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-l-4 border-primary">
-                        <p className="text-sm text-slate-500 dark:text-slate-400 italic">
-                          &quot;{entry.example}&quot;
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  <HistoryEntryCard key={entry.id} entry={entry} />
                 ))}
               </div>
             ) : (

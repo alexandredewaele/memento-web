@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { EntryCategory, JournalEntry } from '@/types'
 import * as api from '@/api/entries'
 import { getCategoryColorClasses } from '@/utils/theme'
+import SearchEntryCard from '@/components/SearchEntryCard'
 
 interface SearchProps {
   entries: JournalEntry[]
@@ -57,13 +58,6 @@ const Search: React.FC<SearchProps> = ({
       setTogglingId(null)
     }
   }
-
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
 
   return (
     <div className="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
@@ -157,62 +151,15 @@ const Search: React.FC<SearchProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {results.map((item) => (
-              <article
+              <SearchEntryCard
                 key={item.id}
-                className="group bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-md transition-all flex flex-col"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide ${getCategoryColorClasses(item.category).badge}`}
-                  >
-                    {item.category}
-                  </span>
-                  <span className="text-xs text-gray-400 font-medium">
-                    {formatDate(item.created_at)}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                  {searchTerm &&
-                  item.title
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ? (
-                    <span className="bg-primary/20 text-primary dark:text-blue-300 px-0.5 rounded">
-                      {item.title}
-                    </span>
-                  ) : (
-                    item.title
-                  )}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3 flex-1">
-                  {item.content}
-                </p>
-
-                {/* Actions row */}
-                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                  <button
-                    onClick={() => handleToggleFavorite(item)}
-                    disabled={togglingId === item.id}
-                    className={`flex items-center gap-1 text-xs transition-colors ${item.is_favorite ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
-                  >
-                    <span className="material-icons-round text-base">
-                      {item.is_favorite ? 'favorite' : 'favorite_border'}
-                    </span>
-                  </button>
-                  <div className="flex-1" />
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    disabled={deletingId === item.id}
-                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <span className="material-icons-round text-base">
-                      {deletingId === item.id
-                        ? 'hourglass_empty'
-                        : 'delete_outline'}
-                    </span>
-                    Delete
-                  </button>
-                </div>
-              </article>
+                item={item}
+                searchTerm={searchTerm}
+                togglingId={togglingId}
+                deletingId={deletingId}
+                onToggleFavorite={handleToggleFavorite}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
