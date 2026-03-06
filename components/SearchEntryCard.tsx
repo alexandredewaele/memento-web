@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { JournalEntry } from '@/types'
 import { getCategoryColorClasses } from '@/utils/theme'
+import { formatDateWithYear } from '@/utils/date'
 
 interface SearchEntryCardProps {
   item: JournalEntry
@@ -44,13 +45,6 @@ const SearchEntryCard: React.FC<SearchEntryCardProps> = ({
     }
   }, [item.content])
 
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-
   return (
     <article
       className={`group bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-md transition-all flex flex-col border-l-4 ${getCategoryColorClasses(item.category).border}`}
@@ -62,7 +56,7 @@ const SearchEntryCard: React.FC<SearchEntryCardProps> = ({
           {item.category}
         </span>
         <span className="text-xs text-gray-400 font-medium">
-          {formatDate(item.created_at)}
+          {formatDateWithYear(item.created_at)}
         </span>
       </div>
       <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">

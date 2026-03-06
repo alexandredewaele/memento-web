@@ -2,6 +2,14 @@ import React, { useState } from 'react'
 import { JournalEntry } from '@/types'
 import { getCategoryColorClasses } from '@/utils/theme'
 import HistoryEntryCard from '@/components/HistoryEntryCard'
+import {
+  formatMonthYear,
+  getDaysInMonth,
+  getFirstDayOfWeek,
+  formatFullDate,
+} from '@/utils/date'
+import { calculateStreak } from '@/utils/stats'
+
 interface HistoryProps {
   entries: JournalEntry[]
 }
@@ -12,14 +20,11 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
   const [viewMonth, setViewMonth] = useState(now.getMonth())
   const [selectedDay, setSelectedDay] = useState<number | null>(now.getDate())
 
-  const monthName = new Date(viewYear, viewMonth, 1).toLocaleDateString(
-    'en-US',
-    { month: 'long', year: 'numeric' },
-  )
+  const monthName = formatMonthYear(viewYear, viewMonth)
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
-  const firstDayOfWeek = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7
+  const daysInMonth = getDaysInMonth(viewYear, viewMonth)
+  const firstDayOfWeek = getFirstDayOfWeek(viewYear, viewMonth)
 
   const entriesByDay = new Map<number, JournalEntry[]>()
   entries.forEach((e) => {
@@ -50,23 +55,7 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
   const selectedEntries = selectedDay ? entriesByDay.get(selectedDay) || [] : []
 
   const totalEntries = entries.length
-  const streak = (() => {
-    let count = 0
-    const check = new Date()
-    check.setHours(0, 0, 0, 0)
-    const daySet = new Set(
-      entries.map((e) => {
-        const d = new Date(e.created_at)
-        d.setHours(0, 0, 0, 0)
-        return d.getTime()
-      }),
-    )
-    while (daySet.has(check.getTime())) {
-      count++
-      check.setDate(check.getDate() - 1)
-    }
-    return count
-  })()
+  const streak = calculateStreak(entries)
 
   return (
     <div className="flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden bg-background-light dark:bg-background-dark">
@@ -191,15 +180,7 @@ const History: React.FC<HistoryProps> = ({ entries }) => {
         {selectedDay ? (
           <>
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-2">
-              {new Date(viewYear, viewMonth, selectedDay).toLocaleDateString(
-                'en-US',
-                {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                },
-              )}
+              {formatFullDate(viewYear, viewMonth, selectedDay)}
             </h2>
             {selectedEntries.length > 0 ? (
               <div className="flex flex-col gap-6">

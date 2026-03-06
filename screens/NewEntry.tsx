@@ -3,6 +3,7 @@ import { EntryCategory, JournalEntry } from '@/types'
 import * as api from '@/api/entries'
 import { Button } from '@/components/Button'
 import { getCategoryColorClasses } from '@/utils/theme'
+import { formatDateLong } from '@/utils/date'
 
 interface NewEntryProps {
   onSaved: (entry: JournalEntry) => void
@@ -54,11 +55,7 @@ const NewEntry: React.FC<NewEntryProps> = ({ onSaved, onCancel }) => {
     }
   }
 
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  })
+  const today = formatDateLong()
 
   return (
     <div className="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">

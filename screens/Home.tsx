@@ -3,6 +3,7 @@ import { JournalEntry } from '@/types'
 import * as api from '@/api/entries'
 import { Button } from '@/components/Button'
 import { getCategoryColorClasses } from '@/utils/theme'
+import { formatDateShort } from '@/utils/date'
 
 interface HomeProps {
   entries: JournalEntry[]
@@ -33,13 +34,6 @@ const Home: React.FC<HomeProps> = ({
       setTogglingId(null)
     }
   }
-
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    })
 
   const displayEntry = selectedEntry ?? entries[0] ?? null
 
@@ -112,7 +106,7 @@ const Home: React.FC<HomeProps> = ({
                   <div className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
                     <span className="text-xs font-medium text-slate-400">
-                      {formatDate(entry.created_at)}
+                      {formatDateShort(entry.created_at)}
                     </span>
                   </div>
                   {entry.is_favorite && (
@@ -153,7 +147,7 @@ const Home: React.FC<HomeProps> = ({
                 {displayEntry.category}
               </span>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                {formatDate(displayEntry.created_at)}
+                {formatDateShort(displayEntry.created_at)}
               </p>
             </div>
             <button
